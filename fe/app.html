@@ -1,0 +1,15 @@
+<div ng-if="!teachNellie" class="d-flex justify-content-center" style="height:100vh">
+    <div class="d-flex align-items-center">
+        <!-- flex -->
+
+
+        <img ng-if="!displayQuestion && !displayResults && !teachNellie" class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
+
+        <ng-include ng-if="displayQuestion" src="'/app_views/asking.html'"></ng-include>
+
+        <ng-include ng-if="displayResults" src="'/app_views/results.html'"></ng-include>
+
+        <!-- flex -->
+    </div>
+</div>
+<ng-include ng-if="teachNellie" src="'/app_views/addform.html'"></ng-include>
