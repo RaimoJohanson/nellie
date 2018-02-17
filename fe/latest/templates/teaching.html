@@ -1,0 +1,84 @@
+<div ng-controller="teaching">
+    <script type="text/javascript">
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+    <div class="text-center" style="border-bottom: 2px solid #ECEEEF; padding:20px; color: #4c4c4c; padding-top:20px">
+        <h5> <i class="fas fa-graduation-cap"></i> Teadmiste jagamine</h5>
+    </div>
+    <div class="text-center" style="margin: 30px">
+
+
+        <div class="container" style="margin-top: 30px">
+
+            <form ng-submit="submitForm()">
+                <div class="form-group row">
+
+                    <div class="col-12">
+                        <h4 class="display-4 text-left">{{teachingForm.fault.label_value}}</h4>
+                    </div>
+                </div>
+                <blockquote class="blockquote text-left">
+                    <h5 style="color: #4c4c4c"><span data-toggle="tooltip" data-placement="top" title="Inspiratsiooniks">Sinu vastatud küsimused</span></h5>
+                </blockquote>
+                <table class="table text-left lead">
+
+                    <tbody ng-repeat="askedQuestion in sessionHistory">
+                        <tr>
+                            <td>{{askedQuestion.value}}</td>
+                            <td>
+                                <span ng-if="askedQuestion.decision != 1" class="font-weight-bold" style="color: #4c4c4c">{{answerTranslate(askedQuestion.decision)}}</span>
+                                <span ng-if="askedQuestion.decision == 1" class="font-weight-bold" style="color: #00c430">{{answerTranslate(askedQuestion.decision)}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+                <blockquote class="blockquote text-left">
+                    <h5 style="#4c4c4c"> Mida tahad küsida?</h5>
+                </blockquote>
+
+                <div class="alert alert-info text-left">
+                    <i class="fas fa-info-circle"></i> Lisa ainult küsimused, mille jaatav vastus sobib sellele veale. <br>
+                    <i class="fas fa-info-circle"></i> Nellie lisab kõik eelnevalt "Jah" vastatud küsimused ise ära.
+                </div>
+                <div ng-repeat="question in teachingForm.newQuestions">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="input-group input-group-lg">
+                                <input type="text" ng-blur="dynamicInput('blur', question._id)" ng-change="dynamicInput('change', question._id)" class="form-control" ng-model="question.value" placeholder="Lisa küsimus">
+                                <span ng-if="question.value" class="input-group-btn">
+                                <button ng-click="dynamicInput('remove', question._id)" class="btn btn-danger" type="button"><i class="fas fa-trash-alt"></i></button>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <div ng-if="err" class="alert alert-success">
+                            {{err}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" style="padding-top:30px">
+                    <div class="col-6  text-left">
+                        <button type="button" href="results" class="btn btn-danger">Katkesta</button>
+                    </div>
+                    <div class="col-6 text-right">
+
+                        <button type="submit" class="btn btn-success">
+                        <span>Edasi</span>
+                    </button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+<div ng-controller="searchExistingFault">
+    <script type="text/javascript">
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+    <div class="text-center" style="border-bottom: 2px solid #ECEEEF; padding:20px; color: #4c4c4c; padding-top:20px">
+        <h5> <i class="fas fa-graduation-cap"></i> Teadmiste jagamine</h5>
+    </div>
+    <div class="text-center" style="margin: 30px">
+
+        <div class="container" style="margin-top: 30px">
+
+
+            <div class="row">
+
+                <div class="col-12">
+                    <!-- 
+                    <div class="input-group input-group-lg">
+                        <input type="text" class="form-control" ng-model="search.name" placeholder="Vea nimetus" ng-change="checkExistingFaults()">
+                       <button ng-change="checkExistingFaults()" class="btn btn-primary" type="submit">Otsi</button>
+                    </div>
+                     -->
+                    <div class="input-group input-group-lg">
+                        <span style="background:transparent; color: #31708F" class="input-group-addon"><i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Parim vea kirjeldus on võimalikult lühike ja selgelt mõistetav"></i></span>
+                        <input ng-change="checkExistingFaults()" type="text" class="form-control" ng-model="search.name" placeholder="Lisa vea nimetus">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div ng-if="err" class="alert alert-success">
+                        {{err}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" ng-if="searchResults" style="margin-top:25px;">
+                <div class="col-12">
+                    <table ng-if="searchResults.length" class="table table-hover text-left lead">
+                        <tbody ng-repeat="result in searchResults">
+                            <tr style="cursor:pointer" ng-click="clarify(result)">
+                                <td>{{ result.value }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span class="lead" ng-if="!searchResults.length">Ei leia midagi</span>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top:30px">
+                <div class="col-6  text-left">
+                    <button type="button" href="results" class="btn btn-danger">Katkesta</button>
+                </div>
+
+                <div class="col-6 text-right">
+
+                    <button type="button" class="btn btn-success" ng-click="proceed()">
+                        <span>Edasi</span>
+                    </button>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
