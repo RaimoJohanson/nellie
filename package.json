@@ -1,0 +1,26 @@
+{
+  "name": "Nellie",
+  "version": "0.0.0",
+  "description": "C4.5 decision tree app for automobile troubleshooting",
+  "main": "server.js",
+  "repository": "",
+  "author": "Raimo Johanson <raimo.johanson@gmail.com>",
+  "dependencies": {
+    "async": "~0.2.8",
+    "body-parser": "^1.17.0",
+    "c4.5": "0.0.1",
+    "csv": "^1.1.1",
+    "express": "~3.2.4",
+    "express-nunjucks": "^2.2.3",
+    "fs": "0.0.1-security",
+    "knex": "^0.14.2",
+    "lazy": "^1.0.11",
+    "learningjs": "^0.1.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.21.0",
+    "mysql": "^2.15.0",
+    "nunjucks": "^3.0.0",
+    "request": "^2.81.0",
+    "socket.io": "~0.9.14"
+  }
+}
