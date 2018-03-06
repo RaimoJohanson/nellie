@@ -5,9 +5,9 @@ const DB_CONFIG = {
     connection: {
         host: "localhost",
         //port: "5432",
-        user: "raimoj",
+        user: 'user',
         //password: "demo",
-        database: "c9",
+        database: 'dbName',
         charset: "UTF8",
         timezone: "EET",
     },
