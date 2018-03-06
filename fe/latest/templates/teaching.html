@@ -1,31 +1,119 @@
 <div ng-controller="teaching">
-    <script type="text/javascript">
-        $(function() {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
-    <div class="text-center" style="border-bottom: 2px solid #ECEEEF; padding:20px; color: #4c4c4c; padding-top:20px">
-        <h5> <i class="fas fa-graduation-cap"></i> Teadmiste jagamine</h5>
-    </div>
-    <div class="text-center" style="margin: 30px">
+    <div class="container text-center" style="margin: 75px auto">
+        <form ng-submit="submitForm()">
+            <div class="form-group row">
 
+                <div ng-if="!sessionHistory" class="col-12">
+                    <div class="row lead" style="padding: 1rem;">
+                        <div class="col-2" style="padding: 0;">
+                            <div class="d-flex justify-content-center text-center" style="background-color: #72C3FC; height: 100%; width: 100%;border-radius: 5px 0px 0px 5px">
 
-        <div class="container" style="margin-top: 30px">
+                                <div class="d-flex align-items-center">
+                                    <i style="font-size: 2em; color:#2F93EA;" class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-10" style="text-align: left; padding: 10px; background-color:#E8F7FF; border-radius: 0px 5px 5px 0px; color:#686868">
 
-            <form ng-submit="submitForm()">
-                <div class="form-group row">
-
-                    <div class="col-12">
-                        <h4 class="display-4 text-left">{{teachingForm.fault.label_value}}</h4>
+                            <h3>Best fault title is short and simple</h3> For example: <em>Worn out brake pads</em>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-lg">
+                                <input type="text" class="form-control" ng-model="teachingForm.fault.label_value" placeholder="Add fault title">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <blockquote class="blockquote text-left">
-                    <h5 style="color: #4c4c4c"><span data-toggle="tooltip" data-placement="top" title="Inspiratsiooniks">Sinu vastatud küsimused</span></h5>
-                </blockquote>
-                <table class="table text-left lead">
+                <div ng-if="sessionHistory" class="col-12">
+                    <h4 class="display-4 text-left">{{teachingForm.fault.label_value}}</h4>
+                </div>
+            </div>
+            <!--
+            <blockquote class="blockquote text-left">
+                <h5 style="#4c4c4c"> What would you ask?</h5>
+            </blockquote>
+            <div class="alert alert-info text-left">
+                Only ask questions that would be answered "yes" and that you already didn't answer "yes". <br> e.g Fault title is "Empty battery" and question is "Cannot see any lights on dashboard?"
+            </div>
+            -->
+            <div class="row lead" style="padding: 1rem;">
+                <div class="col-2" style="padding: 0;">
+                    <div class="d-flex justify-content-center text-center" style="background-color: #72C3FC; height: 100%; width: 100%;border-radius: 5px 0px 0px 5px">
 
-                    <tbody ng-repeat="askedQuestion in sessionHistory">
+                        <div class="d-flex align-items-center">
+                            <i style="font-size: 2em; color:#2F93EA;" class="fas fa-info-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-10" style="text-align: left; padding: 10px; background-color:#E8F7FF; border-radius: 0px 5px 5px 0px; color:#686868">
+
+                    <h3> What would you ask?</h3>
+                    <p> Only ask questions that would be answered <em><b>yes</b></em>.<br> For example if the fault title is <em>Worn out brake pads</em> - a good question would be: <em>Is it heard when braking?</em><br>
+
+                    </p>
+                    <p>
+                        Also note that we'll automatically add questions that you already answered <em><b>yes</b></em>, so you don't have to!<br>
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-group row" ng-repeat="question in teachingForm.newQuestions">
+
+                <div class="col-sm-12">
+                    <div class="input-group input-group-lg">
+                        <input type="text" ng-blur="dynamicInput('blur', question._id)" ng-change="dynamicInput('change', question._id)" class="form-control text-truncate" ng-model="question.value" placeholder="Add question">
+                        <span style="position: absolute;
+                                                top: 50%;
+                                                right: 4em;
+                                                transform: translate(-50%, -50%);
+                                                z-index: 3;
+                                                background-color: #fff;">
+                            <div ng-if="validate(question.value)" style="color: #00bc4e; "><i class="fas fa-check-circle"></i></div>
+                        </span>
+                        <span ng-if="question.value" class="input-group-btn">
+                            <button ng-click="dynamicInput('remove', question._id)" class="btn btn-danger" type="button"><i class="fas fa-trash-alt"></i></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div ng-if="err" class="alert alert-success">
+                        {{err}}
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-top:30px">
+                <div class="col-6">
+                    <div ng-if="sessionHistory" class="btn-group buttons float-left">
+                        <button type="button" href="searchFault" class="btn btn-primary"> 
+                            <i class="fas fa-chevron-circle-left"></i>&nbsp;&nbsp;Back
+                        </button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="btn-group buttons float-right">
+                        <button class="btn btn-success" type="submit">
+                        <span>Done <i class="fas fa-check-circle"></i></span>
+                    </button>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="sessionHistory" style="padding-top:40px;">
+                <table class="table text-left lead">
+                    <thead style="color: #4c4c4c">
                         <tr>
+                            <th>
+                                Your answers
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="askedQuestion in sessionHistory.interactions">
                             <td>{{askedQuestion.value}}</td>
                             <td>
                                 <span ng-if="askedQuestion.decision != 1" class="font-weight-bold" style="color: #4c4c4c">{{answerTranslate(askedQuestion.decision)}}</span>
@@ -34,51 +122,7 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <hr>
-                <blockquote class="blockquote text-left">
-                    <h5 style="#4c4c4c"> Mida tahad küsida?</h5>
-                </blockquote>
-
-                <div class="alert alert-info text-left">
-                    <i class="fas fa-info-circle"></i> Lisa ainult küsimused, mille jaatav vastus sobib sellele veale. <br>
-                    <i class="fas fa-info-circle"></i> Nellie lisab kõik eelnevalt "Jah" vastatud küsimused ise ära.
-                </div>
-                <div ng-repeat="question in teachingForm.newQuestions">
-                    <div class="form-group row">
-                        <div class="col-sm-12">
-                            <div class="input-group input-group-lg">
-                                <input type="text" ng-blur="dynamicInput('blur', question._id)" ng-change="dynamicInput('change', question._id)" class="form-control" ng-model="question.value" placeholder="Lisa küsimus">
-                                <span ng-if="question.value" class="input-group-btn">
-                                <button ng-click="dynamicInput('remove', question._id)" class="btn btn-danger" type="button"><i class="fas fa-trash-alt"></i></button>
-                                </span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-12">
-                        <div ng-if="err" class="alert alert-success">
-                            {{err}}
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group row" style="padding-top:30px">
-                    <div class="col-6  text-left">
-                        <button type="button" href="results" class="btn btn-danger">Katkesta</button>
-                    </div>
-                    <div class="col-6 text-right">
-
-                        <button type="submit" class="btn btn-success">
-                        <span>Edasi</span>
-                    </button>
-                    </div>
-
-                </div>
-            </form>
-
-        </div>
+            </div>
+        </form>
     </div>
 </div>

@@ -1,41 +1,53 @@
 'use strict';
-var request = require('request');
 
 module.exports = function(app) {
-  var testTable = require('../model/generic')(app, 'test');
-  var Main = require('../service/logic')(app);
+  var Logic = require('../service/logic')(app);
 
-  app.get('/data', function(req, res) {
-    console.log('/data');
-    Main.data(req.query).then(result => {
+  app.get('/api/data', (req, res, next) => {
+    Logic.initSession(req.ip).then((id) => {
+      res.locals.sessionID = id[0];
+      next();
+    }).catch(err => {
+      res.json(err);
+    });
+  }, function(req, res) {
+    Logic.data(req.query).then(result => {
+      result.session_id = res.locals.sessionID;
       res.json(result);
     }).catch(err => {
       res.json(err);
     });
   }); //end of app.get
 
-
-
-  app.post('/data', (req, res) => {
-    Main.addData(req.body).then(result => {
+  app.post('/api/data', (req, res) => {
+    Logic.addData(req.body).then(result => {
       res.json(result);
     }).catch(err => {
       res.json(err);
     });
   });
 
-  app.get('/feature', function(req, res) {
-    Main.getFeature(req.query.id).then(result => {
+  app.get('/api/feature', function(req, res) {
+    Logic.getFeature(req.query.id).then(result => {
       res.json(result);
     }).catch(err => {
       res.json(err);
     });
   });
 
-  app.get('/label', function(req, res) {
-    Main.getLabel(req.query.id).then(result => {
+  app.get('/api/label', function(req, res) {
+    Logic.getLabel(req.query).then(result => {
       res.json(result);
     }).catch(err => {
+      res.json(err);
+    });
+  });
+
+  app.put('/api/session/:session_id', function(req, res) {
+    Logic.updateSession(req.params.session_id, req.body).then(() => {
+      res.end();
+    }).catch(err => {
+      console.log(err);
       res.json(err);
     });
   });

@@ -6,6 +6,13 @@ module.exports = function(app) {
 
   app.set('knex', require("./database"));
 
+  app.set('trust proxy', true);
+  /*
+   If false, the app is understood as directly facing the 
+   Internet and the client’s IP address is derived from 
+   req.connection.remoteAddress.
+   This is the default setting.
+   */
 
   app.use(function(req, res, next) {
     let whitelist = ['https://nellie-tiiger.c9users.io'];

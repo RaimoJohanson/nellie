@@ -9,7 +9,6 @@ module.exports = function(app, TABLE_NAME) {
             if (!columns) columns = '*';
             let qb = Knex(TABLE_NAME);
             qb.select(columns);
-            console.log('opts', opts);
             if (opts) {
                 if (opts['where'] && Array.isArray(opts['where'])) opts['where'].forEach(clause => { qb.where(clause[0], clause[1], clause[2]) });
                 else if (opts['where'] && typeof(opts['where']) === 'object') qb.where(opts.where);

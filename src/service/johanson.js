@@ -14,10 +14,10 @@ var data = [
 
 /*
 var data = [
-    { value: 'C', features: [1, 2] },
-    { value: 'C', features: [1, 2] },
-    { value: 'B', features: [1] },
-    { value: 'A', features: [1] }
+    { value: 1, features: [1, 2] },
+    { value: 2, features: [1, 2] },
+    { value: 3, features: [1] },
+    { value: 4, features: [1] }
 ];
 */
 

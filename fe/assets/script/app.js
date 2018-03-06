@@ -1,6 +1,7 @@
-var app = angular.module('myApp', []);
+var app = angular.module('App', []);
 
-app.controller('myCtrl', function($scope, $http, $timeout) {
+app.controller('nellie', function($scope, $http, $timeout) {
+    const API_URL = "https://nellie-api-raimoj.c9users.io/api";
     let bestFeature;
     let minimalGain = 0.000;
     $scope.sessionHistory;
@@ -13,35 +14,39 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
                 translation = 'Jah';
                 break;
             case 0:
-                translation = 'Ei tea'
+                translation = 'Ei tea';
                 break;
             case -1:
-                translation = 'Ei'
+                translation = 'Ei';
                 break;
         }
         return translation;
-    }
-    $scope.dynField = function(action, id) {
+    };
+    $scope.dynamicInput = function(action, id) {
+        let arr = $scope.teachingForm.newQuestions;
+        let arrLength = $scope.teachingForm.newQuestions.length;
         switch (action) {
-            case 'click':
+            case 'change':
                 let add = 1;
-                for (let i = 0; i < $scope.teachingForm.questions.length; i++) {
-                    if (!$scope.teachingForm.questions[i].value && $scope.teachingForm.questions[i].id != id) add = 0;
+                for (let i = 0; i < arrLength; i++) {
+                    if (!arr[i].value && arr[i]._id != id) add = 0;
                 }
-                if ($scope.teachingForm.questions.length < 2) $scope.teachingForm.questions.push({ id: id + 1, value: '' });
-                else if (add) $scope.teachingForm.questions.push({ id: id + 1, value: '' });
+                if (arrLength < 2) $scope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
+                else if (add) $scope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
                 break;
             case 'blur':
-                for (let i = 0; i < $scope.teachingForm.questions.length; i++) {
-                    if ($scope.teachingForm.questions[i].id === id)
-                        if (!$scope.teachingForm.questions[i].value && $scope.teachingForm.questions.length > 1) $scope.teachingForm.questions.splice(i, 1);
+                for (let i = 0; i < arrLength; i++) {
+
+                    if (arr[i]._id === id)
+                        if (!arr[i].value && arrLength > 1 && i != arrLength - 1) $scope.teachingForm.newQuestions.splice(i, 1);
                 }
 
                 break;
             case 'remove':
-                for (let i = 0; i < $scope.teachingForm.questions.length; i++) {
-                    if ($scope.teachingForm.questions[i].id === id && $scope.teachingForm.questions.length > 1) {
-                        $scope.teachingForm.questions.splice(i, 1);
+
+                for (let i = 0; i < $scope.teachingForm.newQuestions.length; i++) {
+                    if (arr[i]._id === id && arrLength > 1) {
+                        $scope.teachingForm.newQuestions.splice(i, 1);
                     }
                 }
                 break;
@@ -72,12 +77,11 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
 
     $scope.showtime = function(status) {
 
-
+        $scope.thanks = false;
         $scope.displayResults = false;
         $scope.displayQuestion = false;
         $scope.teachNellie = false;
         getData();
-
 
     };
     $scope.teach = function(subject = {}) {
@@ -86,23 +90,51 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
                 id: subject.label ? subject.label : undefined,
                 value: subject.label_value ? subject.label_value : undefined
             },
-            questions: [{ id: 0, value: '' }]
+            newQuestions: [{ _id: 0, value: '' }]
         }
         $scope.displayResults = false;
         $scope.teachNellie = true;
-        console.log('Nellie likes to learn');
-        console.log('label_id:', subject.label);
-        console.log(subject)
 
+    };
+    $scope.submitForm = function() {
+        /*
+         * @ $scope.teachingForm = {fault: {id, value}, newQuestions: [{_id,value},{...}]}
+         *
+         * 
+         */
+        $scope.teachNellie = false;
+        //sessionHistory
+        let uploadForm = {
+            label: $scope.teachingForm.fault,
+            newFeatures: [],
+            oldFeatures: []
+        }
+        $scope.sessionHistory.forEach(record => {
+            if (record.answer == 1) uploadForm.oldFeatures.push(record.feature_id);
+        })
+        $scope.teachingForm.newQuestions.forEach(feature => {
+            if (feature.value) uploadForm.newFeatures.push(feature.value);
+        })
+        console.log(uploadForm)
 
+        $http({
+            url: API_URL + '/data',
+            method: "post",
+            data: uploadForm
+        }).then(function(response) {
+            $scope.thanks = true;
+            $scope.feedback = response.data;
+        }).catch(err => {
+            $scope.feedback = err;
+        });
     };
     $scope.results = function() {
         $scope.displayQuestion = false;
 
-        //delete sessionHistory[bestFeature.id];
         let result = sortSolutions($scope.trainingData);
-        query('label', result.unique_ids.join(',')).then(response => {
-            response.data.forEach(subject => {
+
+        getValues('label', result.unique_ids.join(',')).then(response => {
+            response.data.list.forEach(subject => {
                 result.answer.forEach(result => {
                     if (result.label === subject.id) result.label_value = subject.value;
                 });
@@ -139,18 +171,17 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
         $scope.buttons = false;
         if (action === 'yes' || action === 'no') {
             let decision = action === 'yes' ? 1 : -1;
-            $scope.trainingData = prune($scope.trainingData, bestFeature.id, decision);
+            $scope.trainingData = trim($scope.trainingData, bestFeature.id, decision);
         }
         bestFeature = checkHistory(getFeatures($scope.trainingData), $scope.sessionHistory);
 
         if (bestFeature.gain > minimalGain) {
 
-            query('feature', bestFeature.id).then(response => {
-                //todo: add response.data.value to the feature
+            getValues('feature', bestFeature.id).then(response => {
+
                 $scope.question = response.data.value;
 
                 $scope.sessionHistory.push({ feature_id: bestFeature.id, value: response.data.value });
-                console.log($scope.sessionHistory);
                 $scope.displayQuestion = true;
                 $scope.buttons = true;
             }).catch(err => {
@@ -161,7 +192,7 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
     };
 
     var getData = function(args) {
-        var src = "https://nellie-api-raimoj.c9users.io";
+        var src = API_URL;
         var url = src + '/data';
         if (args) { //expect csv
             if (args.yes && args.no) url += '?yes=' + args.yes + '&no=' + args.no;
@@ -169,14 +200,17 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
             else url += '?no=' + args.yes;
         }
         $http.get(url).then(function(response) {
-            $scope.trainingData = response.data;
+
+            $scope.trainingData = response.data.list;
             $scope.interact('load');
+
+
         }).catch(err => {
             $scope.question = err;
         });
     };
-    var query = function(what, id) {
-        var src = "https://nellie-api-raimoj.c9users.io";
+    var getValues = function(what, id) {
+        var src = API_URL;
         var url = src + '/' + what + '?id=' + id;
         return $http.get(url);
     };
@@ -184,10 +218,7 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
         /*     @history = [{id: Number, value: String}]
          *     @features = [{id: "1", gain: "1.0000"}]
          */
-
         if (history.length < 1) return features[0];
-
-
 
         for (let i = 0; i < features.length; i++) {
             let flag = 1;
@@ -200,9 +231,9 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
             if (flag) return features[i];
         }
         console.log('All questions asked');
-        return { gain: minimalGain };
+        return { id: false, gain: minimalGain };
     };
-    var prune = function(data, feature_id, decision) {
+    var trim = function(data, feature_id, decision) {
         let output = [];
 
         data.forEach(subject => {
@@ -232,7 +263,7 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
             let occurance = list.filter(e => e.label === subject.label).length;
             if (!duplicate) {
                 delete subject.features;
-                subject.probability = parseFloat(occurance / list.length).toFixed(2);
+                subject.probability = parseFloat(occurance / list.length).toFixed(2) / 1;
                 result.unique_ids.push(subject.label);
                 result.answer.push(subject);
             }
@@ -334,7 +365,7 @@ app.controller('myCtrl', function($scope, $http, $timeout) {
 
         let gains = [];
         for (let id in informationGain) {
-            gains.push({ id: id, gain: informationGain[id] });
+            gains.push({ id: Number(id), gain: informationGain[id] });
 
         }
         //console.log('Sorted order of features based on info gain:');

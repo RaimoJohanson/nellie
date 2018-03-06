@@ -1,71 +1,89 @@
-<div ng-controller="searchExistingFault">
-    <script type="text/javascript">
-        $(function() {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
-    <div class="text-center" style="border-bottom: 2px solid #ECEEEF; padding:20px; color: #4c4c4c; padding-top:20px">
-        <h5> <i class="fas fa-graduation-cap"></i> Teadmiste jagamine</h5>
+<div ng-controller="searchExistingFault" class="container text-center lead" style="margin: 75px auto">
+    <div class="row lead" style="padding: 1rem;">
+        <div class="col-2" style="padding: 0;">
+            <div class="d-flex justify-content-center text-center" style="background-color: #72C3FC; height: 100%; width: 100%;border-radius: 5px 0px 0px 5px">
+
+                <div class="d-flex align-items-center">
+                    <i style="font-size: 2em; color:#2F93EA;" class="fas fa-info-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-10" style="text-align: left; padding: 10px; background-color:#E8F7FF; border-radius: 0px 5px 5px 0px; color:#686868">
+
+            <h3>Best fault title is short and simple</h3> For example: <em>Worn out brake pads</em>
+        </div>
     </div>
-    <div class="text-center" style="margin: 30px">
 
-        <div class="container" style="margin-top: 30px">
+    <div class="row">
 
-
-            <div class="row">
-
-                <div class="col-12">
-                    <!-- 
-                    <div class="input-group input-group-lg">
-                        <input type="text" class="form-control" ng-model="search.name" placeholder="Vea nimetus" ng-change="checkExistingFaults()">
-                       <button ng-change="checkExistingFaults()" class="btn btn-primary" type="submit">Otsi</button>
-                    </div>
-                     -->
-                    <div class="input-group input-group-lg">
-                        <span style="background:transparent; color: #31708F" class="input-group-addon"><i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Parim vea kirjeldus on võimalikult lühike ja selgelt mõistetav"></i></span>
-                        <input ng-change="checkExistingFaults()" type="text" class="form-control" ng-model="search.name" placeholder="Lisa vea nimetus">
-                    </div>
-
-                </div>
-
+        <div class="col-12">
+            <div class="input-group input-group-lg">
+                <!--
+                    <span style="background:transparent; color: #31708F" class="input-group-addon"><i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="Best fault title is short and simple"></i></span>
+                -->
+                <input ng-change="checkExistingFaults()" type="text" class="form-control" ng-model="teachingForm.fault.label_value" placeholder="Fault title">
             </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <div ng-if="err" class="alert alert-success">
-                        {{err}}
-                    </div>
-                </div>
-            </div>
-
-            <div class="row" ng-if="searchResults" style="margin-top:25px;">
-                <div class="col-12">
-                    <table ng-if="searchResults.length" class="table table-hover text-left lead">
-                        <tbody ng-repeat="result in searchResults">
-                            <tr style="cursor:pointer" ng-click="clarify(result)">
-                                <td>{{ result.value }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <span class="lead" ng-if="!searchResults.length">Ei leia midagi</span>
-                </div>
-            </div>
-
-            <div class="row" style="padding-top:30px">
-                <div class="col-6  text-left">
-                    <button type="button" href="results" class="btn btn-danger">Katkesta</button>
-                </div>
-
-                <div class="col-6 text-right">
-
-                    <button type="button" class="btn btn-success" ng-click="proceed()">
-                        <span>Edasi</span>
-                    </button>
-                </div>
-
-            </div>
-
 
         </div>
     </div>
+
+    <div class="row" ng-if="searchResults">
+        <div class="col-12">
+            <table ng-if="searchResults.length" class="table table-hover text-left lead">
+                <tbody>
+                    <tr ng-class="toggleLabel==result.id ? 'table-active' : ''" style="cursor:pointer" ng-click="showMore(result.id)" ng-repeat-start="result in searchResults">
+                        <td>
+                            <span>
+                                <span style="color:#b2b2b2;" class="mr-2">
+                                    <i ng-if="toggleLabel === result.id" class="fas fa-angle-up"></i>
+                                    <i ng-if="toggleLabel != result.id"class="fas fa-angle-down"></i>
+                                </span> {{ result.value }}
+                            </span>
+                            <span class="badge badge-pill badge-primary float-right" ng-click="clarify(result)" style="cursor:pointer">Select</span>
+                        </td>
+                    </tr>
+                    <tr ng-show="toggleLabel === result.id" ng-repeat-end>
+                        <td style="background-color: #fff; min-height: 100px;word-wrap: break-word;">
+                            <em>
+                                    Description and possible causes of {{ result.value}} is coming soon...
+                            </em>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <!-- Error box -->
+    <div class="row">
+        <div class="col-12">
+            <div ng-if="err" class="alert alert-success">
+                {{err}}
+            </div>
+        </div>
+    </div>
+    <!--
+            <div class="row">
+                <div class="col-12">
+                    <textarea class="form-control lead" rows="3" placeholder="Explain further about this fault"></textarea>
+                </div>
+            </div>
+            -->
+    <!-- Buttons -->
+    <div class="row" style="padding-top:30px">
+        <div class="col-6">
+            <div class="btn-group buttons float-left">
+                <button type="button" href="results" class="btn btn-primary mx-1"><i class="fas fa-chevron-circle-left"></i>&nbsp;&nbsp;Back</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="btn-group buttons float-right">
+                <button ng-if="teachingForm.fault.label_value.length > 4" type="button" class="btn btn-primary" ng-click="proceed()">
+                        <span>Next&nbsp;&nbsp;<i class="fas fa-chevron-circle-right"></i></i></span>
+                    </button>
+            </div>
+        </div>
+    </div>
+
+
 </div>
