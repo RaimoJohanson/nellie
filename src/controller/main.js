@@ -8,14 +8,14 @@ module.exports = function(app) {
       res.locals.sessionID = id[0];
       next();
     }).catch(err => {
-      res.json(err);
+      res.status(412).json(err);
     });
   }, function(req, res) {
     Logic.data(req.query).then(result => {
       result.session_id = res.locals.sessionID;
       res.json(result);
     }).catch(err => {
-      res.json(err);
+      res.status(412).json(err);
     });
   }); //end of app.get
 
@@ -23,7 +23,7 @@ module.exports = function(app) {
     Logic.addData(req.body).then(result => {
       res.json(result);
     }).catch(err => {
-      res.json(err);
+      res.status(412).json(err);
     });
   });
 
@@ -31,7 +31,7 @@ module.exports = function(app) {
     Logic.getFeature(req.query.id).then(result => {
       res.json(result);
     }).catch(err => {
-      res.json(err);
+      res.status(412).json(err);
     });
   });
 
@@ -39,7 +39,7 @@ module.exports = function(app) {
     Logic.getLabel(req.query).then(result => {
       res.json(result);
     }).catch(err => {
-      res.json(err);
+      res.status(412).json(err);
     });
   });
 
@@ -47,8 +47,7 @@ module.exports = function(app) {
     Logic.updateSession(req.params.session_id, req.body).then(() => {
       res.end();
     }).catch(err => {
-      console.log(err);
-      res.json(err);
+      res.status(412).json(err);
     });
   });
 

@@ -76,6 +76,22 @@ App.controller("main", function($rootScope, $scope, $http, $timeout) {
         }
         return;
     };
+    $scope.alertBox = function(message) {
+
+        if (!$scope.err) {
+            $scope.err = message;
+
+            if ($scope.formErrorDebounce) {
+                clearTimeout($scope.formErrorDebounce);
+            }
+
+            $scope.formErrorDebounce = setTimeout(function() {
+                $scope.err = false;
+                $scope.$apply();
+            }, 3000);
+        }
+
+    };
     $rootScope.minHitCount = 3; //How many questions are answered "yes" to display results
     $rootScope.minimalGain = 0.000;
 
@@ -178,10 +194,6 @@ App.controller("teaching", function($rootScope, $scope, $http, $timeout) {
         });
         //console.log(uploadForm)
 
-        //if (!uploadForm.newFeatures.length) return $scope.err = "Add at least one question";
-        if (!uploadForm.label.label_value) return $scope.err = "Fault title is missing";
-        else if ($scope.err) $scope.err = false;
-
         uploadForm.session_id = $rootScope.session_id;
 
         $http({
@@ -193,8 +205,7 @@ App.controller("teaching", function($rootScope, $scope, $http, $timeout) {
             $rootScope.view = 'thanks';
 
         }).catch(err => {
-
-            $scope.err = err;
+            $scope.alertBox(err.data);
         });
     };
 });

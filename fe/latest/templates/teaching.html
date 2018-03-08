@@ -78,11 +78,24 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div ng-if="err" class="alert alert-success">
-                        {{err}}
+            <div ng-show="err" class="row lead" style="padding: 1rem;">
+
+                <div class="col-2" style="padding: 0;">
+
+
+                    <div class="d-flex justify-content-center text-center" style="background-color: #fc7171; height: 100%; width: 100%;border-radius: 5px 0px 0px 5px">
+
+                        <div class="d-flex align-items-center">
+                            <i style="font-size: 2em; color:#ea2e2e;" class="fas fa-times-circle"></i>
+                        </div>
                     </div>
+
+                </div>
+                <div class="col-10 lead" style=" text-align: left; padding: 10px; background-color:#ffe8e8; border-radius: 0px 5px 5px 0px; color: #ea2e2e;">
+                    <h3> Something's not right!</h3>
+                    <p>
+                        {{err}}
+                    </p>
                 </div>
             </div>
             <div class="row" style="padding-top:30px">
@@ -101,14 +114,16 @@
                     </div>
                 </div>
             </div>
+
             <div ng-if="sessionHistory" style="padding-top:40px;">
                 <table class="table text-left lead">
                     <thead style="color: #4c4c4c">
                         <tr>
                             <th>
-                                Your answers
+                                Question
                             </th>
                             <th>
+                                Your answer
                             </th>
                         </tr>
                     </thead>

@@ -173,44 +173,35 @@ module.exports = function(app) {
              *          }
              */
             return new Promise((resolve, reject) => {
+
+                if (!data.newFeatures.length) return reject('Add at least one question');
+                if (!data.label.label_value.length) return reject('Take a look at the fault title');
+
                 let label = new Promise((resolve, reject) => {
                     if (data.label.label) return resolve(data.label.label)
                     else Labels.insert({ value: data.label.label_value, session_id: data.session_id }).then(id => resolve(id[0])).catch(reject);
                 });
                 let features = new Promise((resolve, reject) => {
                     let newFeatureIds = [];
-                    if (data.newFeatures) {
-                        async.each(data.newFeatures, (feature, cb) => {
-                            Features.insert({ value: feature, session_id: data.session_id }).then(id => {
-                                newFeatureIds.push(id[0]);
-                                cb();
-                            })
-
-                        }, () => {
-                            return resolve(newFeatureIds)
+                    async.each(data.newFeatures, (feature, cb) => {
+                        Features.insert({ value: feature, session_id: data.session_id }).then(id => {
+                            newFeatureIds.push(id[0]);
+                            cb();
                         })
-                    }
-                    else return resolve(newFeatureIds);
 
-                })
-
-
+                    }, () => {
+                        return resolve(newFeatureIds)
+                    })
+                });
                 Promise.all([label, features]).then(result => {
-
-
                     let label_id = result[0];
                     let feature_ids = data.oldFeatures.concat(result[1])
-
                     LabelFeatures.insert({ label_id: label_id, features: '||' + feature_ids.join('||') + '||', session_id: data.session_id }).then(id => {
                         resolve('all done');
                     }).catch(reject);
-
                 }).catch(reject);
 
             })
-        },
-        saveSession: function(data) {
-
         }
     };
 
