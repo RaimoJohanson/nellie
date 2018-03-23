@@ -174,14 +174,13 @@ module.exports = function(app) {
              */
             return new Promise((resolve, reject) => {
 
-                if (!data.newFeatures.length) return reject('Add at least one question');
-                if (!data.label.label_value.length) return reject('Take a look at the fault title');
-
+                //todo:
                 let label = new Promise((resolve, reject) => {
-                    if (data.label.label) return resolve(data.label.label)
+                    if (data.label.label) return resolve(data.label.label);
                     else Labels.insert({ value: data.label.label_value, session_id: data.session_id }).then(id => resolve(id[0])).catch(reject);
                 });
                 let features = new Promise((resolve, reject) => {
+
                     let newFeatureIds = [];
                     async.each(data.newFeatures, (feature, cb) => {
                         Features.insert({ value: feature, session_id: data.session_id }).then(id => {
@@ -202,6 +201,9 @@ module.exports = function(app) {
                 }).catch(reject);
 
             })
+        },
+        endorseData: function(data) {
+            return LabelFeatures.insert({ label_id: data.label.label, features: '||' + data.oldFeatures.join('||') + '||', session_id: data.session_id })
         }
     };
 

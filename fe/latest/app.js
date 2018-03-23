@@ -279,7 +279,8 @@ App.controller("results", function($rootScope, $scope, $http, $timeout) {
         if (!fault.label) return;
         let uploadForm = {
             label: { label: fault.label, label_value: fault.label_value },
-            oldFeatures: []
+            oldFeatures: [],
+            session_id: $rootScope.session_id
         };
 
         $rootScope.sessionHistory.interactions.forEach(r => {
@@ -287,7 +288,7 @@ App.controller("results", function($rootScope, $scope, $http, $timeout) {
         });
 
         $http({
-            url: API_URL + '/data',
+            url: API_URL + '/endorse',
             method: "post",
             data: uploadForm
         }).then(function(response) {
@@ -387,7 +388,7 @@ App.controller("asking", function($rootScope, $scope, $http, $timeout) {
             $scope.time = Date.now();
 
         }).catch(err => {
-            $scope.currentQuestion.value = err;
+            $scope.currentQuestion.value = err.data;
         });
     }
 
@@ -476,14 +477,15 @@ App.controller("asking", function($rootScope, $scope, $http, $timeout) {
                         if (subject.features.indexOf(Number(record.id)) > -1) matches++;
                         else matches--;
                         break;
-
-                    case 0:
-                        if (subject.features.indexOf(Number(record.id)) < 0) matches++;
-                        else matches--;
-                        break;
+                        /*
+                                            case 0:
+                                                if (subject.features.indexOf(Number(record.id)) < 0) matches++;
+                                                else matches--;
+                                                break;
+                                                */
                 }
             });
-            subject.fitness = matches / subject.features.length;
+            subject.fitness = matches / $rootScope.sessionHistory.hit_count;
         });
         return data;
 

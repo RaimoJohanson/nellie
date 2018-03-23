@@ -23,10 +23,18 @@ module.exports = function(app) {
     Logic.addData(req.body).then(result => {
       res.json(result);
     }).catch(err => {
+      console.log(err);
       res.status(412).json(err);
     });
   });
-
+  app.post('/api/endorse', (req, res) => {
+    Logic.endorseData(req.body).then(result => {
+      res.json(result);
+    }).catch(err => {
+      console.log(err);
+      res.status(412).json(err);
+    });
+  });
   app.get('/api/feature', function(req, res) {
     Logic.getFeature(req.query.id).then(result => {
       res.json(result);
