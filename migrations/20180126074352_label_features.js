@@ -5,9 +5,6 @@ exports.up = function(knex, Promise) {
             table.integer('label_id').unsigned();
             table.foreign('label_id').onDelete('CASCADE').references('labels.id');
             table.string('features').notNullable();
-            //table.integer('created_by').unsigned().references('users.id');
-            //table.integer('updated_by').unsigned().references('users.id');
-
             table.integer('session_id').unsigned();
             table.foreign('session_id').onDelete('SET NULL').references('session_history.id');
             table.timestamp('created_at').defaultTo(knex.fn.now());

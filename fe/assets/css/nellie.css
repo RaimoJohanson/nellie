@@ -1,127 +1,117 @@
+.imagemodal,
+.popup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5) center center no-repeat;
+    background-size: contain;
+    z-index: 9999;
+    cursor: pointer;
+    padding: 0 20px;
+    overflow: auto;
+}
+
+.imagemodal .popup-modal-inline,
+.popup-modal .popup-modal-inline {
+    display: block;
+    max-width: 800px;
+    background: #fff;
+    margin: 20px auto;
+    padding: 40px;
+    cursor: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.5);
+}
+
+.imagemodal h1,
+.popup-modal h1 {
+    margin: -40px -40px 40px -40px;
+    display: block;
+    padding: 10px 40px;
+    border-bottom: #b1b1b1 1px solid;
+}
+
+.imagemodal h1 .btn,
+.popup-modal h1 .btn {
+    vertical-align: center;
+}
+
+.modal-open .view,
+.modal-open .navbar {
+    filter: blur(2px);
+}
+
+.loader {
+    opacity: 0;
+}
+
+.show-loader {
+    opacity: 1;
+}
+
+.busy-text {
+    opacity: 0.6;
+}
+
 html,
 body {
     height: 100%;
 }
 
-.nav-btn-nellie {
-    -webkit-border-radius: 5;
-    -moz-border-radius: 5;
-    border-radius: 5px;
-    font-family: Arial;
-    color: #fff;
-    font-size: 1rem;
-    padding: 10px 20px 10px 20px;
-    text-decoration: none;
-    border-color: #fff;
-    border-width: 2px;
-}
-
-.nav-btn-nellie:hover {
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
-}
-
-.nav-colored {
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-.hide {
-    height: 0px;
-}
-
-.nav-transparent {
-    background-color: transparent;
-}
-
-.landing-page {
-    width: 100%;
-    margin: 0 auto;
-    padding: 0;
-    background: linear-gradient( rgba(0, 0, 0, 0.70), rgba(0, 0, 0, 0.70)), url(/assets/img/original.jpg) no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    display: flex;
-}
-
-.shadow {
-    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-}
-
-.haze {
-    width: 100%;
-    height: 100%;
-}
-
-.jumbo-nellie {
-    background-color: transparent;
-    text-align: center;
-    color: #fff;
-}
-
-.vertical-center {
+.view {
     min-height: 100%;
-    /* Fallback for browsers do NOT support vh unit */
-    min-height: 100vh;
-    /* These two lines are counted as one :-)       */
-    display: flex;
-    align-items: center;
 }
 
-.nellie {
-    width: 30%;
-    min-width: 200px;
+body {
+    background: #f1f1f1;
 }
 
-.nellie-section {
-    padding-top: 40px;
+.block {
+    background: #fff;
+    max-width: 1200px;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 auto;
 }
 
-.app-section {
-    background-color: #fff;
-    border-bottom: 2px solid;
-    border-bottom-color: rgba(0, 0, 0, 0.2);
-    border-radius: 0;
-}
-
-.app-kiisu {
-    background: linear-gradient( rgba(0, 0, 0, 0.70), rgba(0, 0, 0, 0.70)), url(/assets/img/original.jpg) no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-}
-
-.kiisu-text {
-    color: #fff;
-}
-
-.app-btn {
-    margin: 10px;
-    min-width: 100px;
-}
-
-#about {
-    padding-bottom: 40px;
-}
-
-.btn-back-arrow {
-    cursor: pointer;
-    height: 50px;
-}
-
-.footer {
+.block .container {
     width: 100%;
-    color: #0275d8;
-    padding: 40px 20px 30px 40px;
-    background-color: #fff;
+    padding-left: 0;
+    padding-right: 0;
 }
 
-.cursor {
-    position: absolute;
-    right: 25%;
-    bottom: 50px;
+.loader-ring {
+    display: block;
+    margin: 0 auto;
+}
+
+@media screen and (max-width:370px) {
+    .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 21px;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+    }
+    .input-group .btn {
+        margin-bottom: 0;
+    }
+    .block {
+        width: 100%;
+    }
+}
+
+.footer-ribbon {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    color: #999;
+    line-height: 32px;
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 999;
 }

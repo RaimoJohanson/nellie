@@ -2,24 +2,9 @@ var API_URL = "https://nellie-api-raimoj.c9users.io/api";
 var APP_LANG = 'eng'; //'et'
 
 var App = angular.module('App', []);
-App.directive("href", function($rootScope, $timeout) {
-    return {
-        restrict: "A",
-        link: function($scope, $element, $attr, ) {
-
-            $element.bind("click", function(e) {
-                e.preventDefault();
-                $rootScope.view = $attr.href;
-                $timeout(function() {
-                    $rootScope.$apply();
-                }, 0);
-            });
-        }
-    }
-});
-
 
 App.controller("main", function($rootScope, $scope, $http, $timeout) {
+
     $scope.resetApplication = function(args) {
         $rootScope.sessionUploaded = false;
         $rootScope.teachingForm = {
@@ -28,7 +13,7 @@ App.controller("main", function($rootScope, $scope, $http, $timeout) {
         $rootScope.searchResults = [];
 
         $rootScope.loading = true;
-        let url = API_URL + '/data';
+        var url = API_URL + '/data';
 
         if (args) { //expect csv
             if (args.yes && args.no) url += '?yes=' + args.yes + '&no=' + args.no;
@@ -98,223 +83,8 @@ App.controller("main", function($rootScope, $scope, $http, $timeout) {
     $scope.resetApplication(); //Start asking
 });
 
-App.controller("searchExistingFault", function($rootScope, $scope, $http, $timeout) {
-    $scope.toggleLabel = -1;
-    $scope.showMore = function(id) {
-        $scope.toggleLabel === id ? $scope.toggleLabel = undefined : $scope.toggleLabel = id;
-    };
-    $scope.checkExistingFaults = function() {
-        if ($rootScope.teachingForm.fault.label_value.length < 3) return $rootScope.searchResults = [];
-
-        $http.get(API_URL + '/label?name=' + $rootScope.teachingForm.fault.label_value).then(response => {
-            $rootScope.searchResults = response.data.list;
-        }).catch(err => {
-            $scope.err = err;
-        });
-    }
-    $scope.proceed = function() {
-        if (!$rootScope.teachingForm.fault.label_value) return $scope.err = 'Lisa vea nimetus enne';
-
-        $rootScope.view = "teaching";
-    }
-    $scope.clarify = function(fault) {
-        //fault = {id: id, value: ''}
-        if (!fault.id) return;
-
-        $rootScope.teachingForm.fault = {
-            label: fault.id,
-            label_value: fault.value
-        };
-
-        $rootScope.view = "teaching";
-    }
-});
-
-App.controller("teaching", function($rootScope, $scope, $http, $timeout) {
-
-    //console.log($rootScope.teachingForm);
-    //console.log($rootScope.sessionHistory.interactions);
-    $scope.validate = function(value) {
-        if (value.charAt(value.length - 1) != '?') return false;
-        if (!value.includes(' ')) return false;
-        if (value.length < 3) return false;
-        return true;
-    }
-
-    $scope.dynamicInput = function(action, id) {
-        let arr = $rootScope.teachingForm.newQuestions;
-        let arrLength = $rootScope.teachingForm.newQuestions.length;
-        switch (action) {
-            case 'change':
-                let add = 1;
-                for (let i = 0; i < arrLength; i++) {
-                    if (!arr[i].value && arr[i]._id != id) add = 0;
-                }
-                if (arrLength < 2) $rootScope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
-                else if (add) $rootScope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
-                break;
-            case 'blur':
-                for (let i = 0; i < $rootScope.teachingForm.newQuestions.length; i++) {
-
-                    if ($rootScope.teachingForm.newQuestions[i]._id === id)
-                        if (!arr[i].value && arrLength > 1 && i != arrLength - 1) $rootScope.teachingForm.newQuestions.splice(i, 1);
-                }
-
-                break;
-            case 'remove':
-
-                for (let i = 0; i < $rootScope.teachingForm.newQuestions.length; i++) {
-                    if (arr[i]._id === id && arrLength > 1) {
-                        $rootScope.teachingForm.newQuestions.splice(i, 1);
-                    }
-                }
-                break;
-        }
-
-    };
-    $scope.submitForm = function() {
-        /*
-         * @ $scope.teachingForm = {fault: {id, value}, newQuestions: [{_id,value},{...}]}
-         *
-         * 
-         */
-        $scope.teachNellie = false;
-        let uploadForm = {
-            label: $scope.teachingForm.fault,
-            newFeatures: [],
-            oldFeatures: []
-        };
-        if ($rootScope.sessionHistory) {
-            $rootScope.sessionHistory.interactions.forEach(record => {
-                if (record.decision == 1) uploadForm.oldFeatures.push(record.id);
-            });
-        }
-        $rootScope.teachingForm.newQuestions.forEach(feature => {
-            if (feature.value) uploadForm.newFeatures.push(feature.value);
-        });
-        //console.log(uploadForm)
-
-        uploadForm.session_id = $rootScope.session_id;
-
-        $http({
-            url: API_URL + '/data',
-            method: "post",
-            data: uploadForm
-        }).then(function(response) {
-
-            $rootScope.view = 'thanks';
-
-        }).catch(err => {
-            $scope.alertBox(err.data);
-        });
-    };
-});
-
-App.controller("results", function($rootScope, $scope, $http, $timeout) {
-    $scope.faults = sortSolutions($rootScope.trainingData); //sort by percentage
-
-    $scope.uploadSession({
-        sessionHistory: $rootScope.sessionHistory,
-        results: $scope.faults.answer
-    });
-
-    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount) {
-
-        $scope.displayResults = true;
-        if (!$scope.faults.answer[0].label_value) {
-            $scope.busy = true;
-            $http.get(API_URL + '/label?id=' + $scope.faults.unique_ids.join(',')).then(response => {
-                response.data.list.forEach(subject => {
-                    $scope.faults.answer.forEach(fault => {
-                        if (fault.label === subject.id) fault.label_value = subject.value;
-                    });
-                });
-                $scope.busy = false;
-            }).catch(err => {
-                $scope.err = err;
-                $scope.busy = false;
-            });
-        }
-    }
-    else $scope.displayResults = false;
-
-    function sortSolutions(list) {
-        let result = {
-            unique_ids: [],
-            answer: []
-        };
-        let fitness_sum = 0;
-        list.forEach(subject => {
-            fitness_sum += subject.fitness;
-
-        });
-
-        list.forEach(subject => {
-            let duplicate = result.answer.some(e => e.label === subject.label);
-            let occurance = list.filter(e => e.label === subject.label).length;
-            if (!duplicate) {
-                delete subject.features; //features vary on different instances
-                //subject.probability = parseFloat(occurance / list.length).toFixed(2) / 1;
-
-                subject.probability = parseFloat(subject.fitness / fitness_sum).toFixed(2) / 1;
-                result.unique_ids.push(subject.label);
-                result.answer.push(subject);
-            }
-            else {
-                result.answer.forEach(record => {
-                    if (record.label === subject.label) {
-
-                        record.fitness += subject.fitness;
-                        record.probability = parseFloat(record.fitness / fitness_sum).toFixed(2) / 1;
-                    }
-                });
-            }
-        });
-        result.answer = result.answer.sort(function(a, b) { return b.probability - a.probability });
-        return result;
-    }
-    $scope.endorse = function(fault) {
-        //fault = {label: id, label_value: 'asdasd'}
-
-        if (!fault.label) return;
-        let uploadForm = {
-            label: { label: fault.label, label_value: fault.label_value },
-            oldFeatures: [],
-            session_id: $rootScope.session_id
-        };
-
-        $rootScope.sessionHistory.interactions.forEach(r => {
-            if (r.decision === 1) uploadForm.oldFeatures.push(r.id);
-        });
-
-        $http({
-            url: API_URL + '/endorse',
-            method: "post",
-            data: uploadForm
-        }).then(function(response) {
-            // console.log(fault.label);
-            $scope.endorsed = fault.label;
-
-        }).catch(err => {
-
-            $scope.err = err;
-        });
-    };
-    $scope.showMore = function(id) {
-        $scope.toggleLabel === id ? $scope.toggleLabel = undefined : $scope.toggleLabel = id;
-    };
-    $scope.clarify = function(fault) {
-        //fault = {label: id, label_value: ''}
-
-        if (!fault.label || $scope.can_clarify === false) return;
-
-        $rootScope.teachingForm.fault = fault;
-        //$rootScope.view = "extraQuestions";
-        $rootScope.view = "teaching";
-    };
-});
-
 App.controller("asking", function($rootScope, $scope, $http, $timeout) {
+
     $rootScope.sessionHistory = {
         hit_count: 0,
         interactions: []
@@ -357,8 +127,12 @@ App.controller("asking", function($rootScope, $scope, $http, $timeout) {
                 // console.log('Length of trainingData after trimming:', $rootScope.trainingData.length);
             }
         }
+        //omg
+        var oldValue = $scope.currentQuestion.value;
 
         $scope.currentQuestion = checkHistory(getFeatures($rootScope.trainingData), $rootScope.sessionHistory.interactions);
+
+        $scope.currentQuestion.value = oldValue;
 
         $scope.round++;
 
@@ -620,5 +394,326 @@ App.controller("asking", function($rootScope, $scope, $http, $timeout) {
         }
         //console.log('Sorted order of features based on info gain:');
         return gains.sort(function(a, b) { return b.gain - a.gain });
+    }
+});
+
+App.controller("results", function($rootScope, $scope, $http, $timeout) {
+    $scope.faults = sortSolutions($rootScope.trainingData); //sort by percentage
+
+    $scope.uploadSession({
+        sessionHistory: $rootScope.sessionHistory,
+        results: $scope.faults.answer
+    });
+
+    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount) {
+
+        $scope.displayResults = true;
+        if (!$scope.faults.answer[0].label_value) {
+            $scope.busy = true;
+            $http.get(API_URL + '/label?id=' + $scope.faults.unique_ids.join(',')).then(response => {
+                response.data.list.forEach(subject => {
+                    $scope.faults.answer.forEach(fault => {
+                        if (fault.label === subject.id) fault.label_value = subject.value;
+                    });
+                });
+                $scope.busy = false;
+            }).catch(err => {
+                $scope.err = err;
+                $scope.busy = false;
+            });
+        }
+    }
+    else $scope.displayResults = false;
+
+    function sortSolutions(list) {
+        let result = {
+            unique_ids: [],
+            answer: []
+        };
+        let fitness_sum = 0;
+        list.forEach(subject => {
+            fitness_sum += subject.fitness;
+
+        });
+
+        list.forEach(subject => {
+            let duplicate = result.answer.some(e => e.label === subject.label);
+            let occurance = list.filter(e => e.label === subject.label).length;
+            if (!duplicate) {
+                delete subject.features; //features vary on different instances
+                //subject.probability = parseFloat(occurance / list.length).toFixed(2) / 1;
+
+                subject.probability = parseFloat(subject.fitness / fitness_sum).toFixed(2) / 1;
+                result.unique_ids.push(subject.label);
+                result.answer.push(subject);
+            }
+            else {
+                result.answer.forEach(record => {
+                    if (record.label === subject.label) {
+
+                        record.fitness += subject.fitness;
+                        record.probability = parseFloat(record.fitness / fitness_sum).toFixed(2) / 1;
+                    }
+                });
+            }
+        });
+        result.answer = result.answer.sort(function(a, b) { return b.probability - a.probability });
+        return result;
+    }
+    $scope.endorse = function(fault) {
+        //fault = {label: id, label_value: 'asdasd'}
+
+        if (!fault.label) return;
+        let uploadForm = {
+            label: { label: fault.label, label_value: fault.label_value },
+            oldFeatures: [],
+            session_id: $rootScope.session_id
+        };
+
+        $rootScope.sessionHistory.interactions.forEach(r => {
+            if (r.decision === 1) uploadForm.oldFeatures.push(r.id);
+        });
+
+        $http({
+            url: API_URL + '/endorse',
+            method: "post",
+            data: uploadForm
+        }).then(function(response) {
+            // console.log(fault.label);
+            $scope.endorsed = fault.label;
+
+        }).catch(err => {
+
+            $scope.err = err;
+        });
+    };
+    $scope.showMore = function(id) {
+        $scope.toggleLabel === id ? $scope.toggleLabel = undefined : $scope.toggleLabel = id;
+    };
+});
+
+App.controller("searchExistingFault", function($rootScope, $scope, $http, $timeout) {
+    $scope.toggleLabel = -1;
+    $scope.showMore = function(id) {
+        $scope.toggleLabel === id ? $scope.toggleLabel = undefined : $scope.toggleLabel = id;
+    };
+    $scope.checkExistingFaults = function() {
+        if ($rootScope.teachingForm.fault.label_value.length < 3) return $rootScope.searchResults = [];
+
+        $http.get(API_URL + '/label?name=' + $rootScope.teachingForm.fault.label_value).then(response => {
+            $rootScope.searchResults = response.data.list;
+        }).catch(err => {
+            $scope.err = err;
+        });
+    }
+    $scope.proceed = function() {
+        if (!$rootScope.teachingForm.fault.label_value) return $scope.err = 'Lisa vea nimetus enne';
+
+        $rootScope.view = "teaching";
+    }
+    $scope.clarify = function(fault) {
+        //fault = {id: id, value: ''}
+        if (!fault.id) return;
+
+        $rootScope.teachingForm.fault = {
+            label: fault.id,
+            label_value: fault.value
+        };
+
+        $rootScope.view = "teaching";
+    }
+});
+
+App.controller("teaching", function($rootScope, $scope, $http, $timeout) {
+
+    //console.log($rootScope.teachingForm);
+    //console.log($rootScope.sessionHistory.interactions);
+    $scope.validate = function(value) {
+        if (value.charAt(value.length - 1) != '?') return false;
+        if (!value.includes(' ')) return false;
+        if (value.length < 3) return false;
+        return true;
+    }
+
+    $scope.dynamicInput = function(action, id) {
+        let arr = $rootScope.teachingForm.newQuestions;
+        let arrLength = $rootScope.teachingForm.newQuestions.length;
+        switch (action) {
+            case 'change':
+                let add = 1;
+                for (let i = 0; i < arrLength; i++) {
+                    if (!arr[i].value && arr[i]._id != id) add = 0;
+                }
+                if (arrLength < 2) $rootScope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
+                else if (add) $rootScope.teachingForm.newQuestions.push({ _id: id + 1, value: '' });
+                break;
+            case 'blur':
+                for (let i = 0; i < $rootScope.teachingForm.newQuestions.length; i++) {
+
+                    if ($rootScope.teachingForm.newQuestions[i]._id === id)
+                        if (!arr[i].value && arrLength > 1 && i != arrLength - 1) $rootScope.teachingForm.newQuestions.splice(i, 1);
+                }
+
+                break;
+            case 'remove':
+
+                for (let i = 0; i < $rootScope.teachingForm.newQuestions.length; i++) {
+                    if (arr[i]._id === id && arrLength > 1) {
+                        $rootScope.teachingForm.newQuestions.splice(i, 1);
+                    }
+                }
+                break;
+        }
+
+    };
+    $scope.submitForm = function() {
+        /*
+         * @ $scope.teachingForm = {fault: {id, value}, newQuestions: [{_id,value},{...}]}
+         *
+         * 
+         */
+        $scope.teachNellie = false;
+        let uploadForm = {
+            label: $scope.teachingForm.fault,
+            newFeatures: [],
+            oldFeatures: []
+        };
+        if ($rootScope.sessionHistory) {
+            $rootScope.sessionHistory.interactions.forEach(record => {
+                if (record.decision == 1) uploadForm.oldFeatures.push(record.id);
+            });
+        }
+        $rootScope.teachingForm.newQuestions.forEach(feature => {
+            if (feature.value) uploadForm.newFeatures.push(feature.value);
+        });
+        //console.log(uploadForm)
+
+        uploadForm.session_id = $rootScope.session_id;
+
+        $http({
+            url: API_URL + '/data',
+            method: "post",
+            data: uploadForm
+        }).then(function(response) {
+
+            $rootScope.view = 'thanks';
+
+        }).catch(err => {
+            $scope.alertBox(err.data);
+        });
+    };
+});
+
+App.directive("feedback", function($templateCache, $http, $compile, $document, $rootScope, $timeout) {
+    return {
+        restrict: "A",
+        scope: false,
+        link: function($scope, $element, $attrs) {
+            var state = 0;
+            $scope.feedbackQuestions = [{
+                    _id: 1,
+                    label: "Ease of adding a new fault?",
+                    type: 'starRating'
+                },
+                {
+                    _id: 2,
+                    label: "Understandability of the questions?",
+                    type: 'starRating'
+                }, {
+                    _id: 3,
+                    label: "Accuracy of the results?",
+                    type: 'starRating'
+                }, {
+                    _id: 4,
+                    label: "Suggestions",
+                    type: 'textarea'
+                }, {
+                    _id: 5,
+                    label: "Bug report",
+                    type: 'textarea'
+                }
+            ];
+            $scope.submitFeedback = function() {
+                $scope.busy = true;
+                var payload = [];
+                for (var question in $scope.feedback) {
+                    $scope.feedbackQuestions.forEach(fq => {
+                        if (fq._id == question) {
+                            payload.push({
+                                question: fq.label,
+                                value: $scope.feedback[question]
+                            })
+                        }
+                    })
+                }
+
+                $http({
+                    url: API_URL + '/feedback/' + $rootScope.session_id,
+                    method: "post",
+                    data: payload
+                }).then(function(response) {
+                    $scope.busy = false;
+                    $scope.feedbackSent = true;
+
+                }).catch(err => {
+                    $scope.alertBox(err.data);
+                });
+            };
+
+            function openModal() {
+                if (state == 1) { return false; }
+                state = 1;
+                $scope.feedbackSent = false;
+                console.log('openModal');
+                $scope.feedback = {};
+                $("body").addClass("modal-open");
+
+                $http.get('app/templates/feedbackmodal.tpl').then(function(response) {
+
+                    //$("body").append(response.data);
+                    //console.log($document.find("#popup-modal"));
+
+                    var modal = $compile(response.data)($scope);
+
+                    $document.find('body').eq(0).append(modal);
+
+                    $('#popup-modal').bind("click", function(e) {
+                        if ($(e.target).is("#popup-modal, #close-modal")) {
+                            $(this).remove();
+                            $("body").removeClass("modal-open");
+                            state = 0;
+                        }
+
+                    });
+
+                    $timeout(function() {
+                        $scope.$apply();
+                    }, 0);
+                });
+            };
+
+            $element.bind("click", function(e) {
+                e.preventDefault();
+                openModal();
+            });
+        }
+    }
+});
+
+App.directive("href", function($rootScope, $timeout) {
+    return {
+        restrict: "A",
+        link: function($scope, $element, $attr) {
+
+            $element.bind("click", function(e) {
+                e.preventDefault();
+                if ($attr.href !== "javascript:void(0);") {
+                    $rootScope.view = $attr.href;
+                    $timeout(function() {
+                        $rootScope.$apply();
+                    }, 0);
+                }
+            });
+        }
     }
 });

@@ -9,8 +9,20 @@ module.exports = function(app) {
     var SessionHistory = require('../model/generic')(app, 'session_history');
     var SessionAnswers = require('../model/generic')(app, 'session_answers');
     var SessionResults = require('../model/generic')(app, 'session_results');
+    var Feedback = require('../model/generic')(app, 'feedback');
 
     let output = {
+
+        feedback: function(session_id, data) {
+            return new Promise((resolve, reject) => {
+
+                async.each(data, (opinion, cb) => {
+                    Feedback.insert({ question: opinion.question, value: opinion.value, session_id: session_id }).then(cb).catch(reject);
+                }, () => {
+                    resolve();
+                });
+            });
+        },
         initSession: function(ip) {
             return SessionHistory.insert({ 'ipv4': ip });
         },
@@ -99,7 +111,6 @@ module.exports = function(app) {
                 LabelFeatures.find(['label_id as label', 'features'], opts).then(data => {
 
                     async.each(data, (record, cb) => {
-                        record.fitness = 0;
                         record.features = record.features.split('||').slice(1, -1).map(Number);
                         cb();
                     }, () => {
