@@ -6,7 +6,7 @@ App.controller("results", function($rootScope, $scope, $http, $timeout) {
         results: $scope.faults.answer
     });
 
-    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount) {
+    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount && $scope.faults.answer.length < 0) {
 
         $scope.displayResults = true;
         if (!$scope.faults.answer[0].label_value) {
@@ -45,8 +45,11 @@ App.controller("results", function($rootScope, $scope, $http, $timeout) {
                 //subject.probability = parseFloat(occurance / list.length).toFixed(2) / 1;
 
                 subject.probability = parseFloat(subject.fitness / fitness_sum).toFixed(2) / 1;
-                result.unique_ids.push(subject.label);
-                result.answer.push(subject);
+
+                if (subject.probability > 0) {
+                    result.unique_ids.push(subject.label);
+                    result.answer.push(subject);
+                }
             }
             else {
                 result.answer.forEach(record => {
