@@ -1,4 +1,4 @@
-<div ng-controller="results">
+<div ng-controller="results" class="block">
     <div ng-if="busy" class="d-flex justify-content-center" style="min-height:100vh">
         <div class="d-flex align-items-center">
             <img class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
@@ -12,23 +12,13 @@
             </div>
         </div>
     </div>
-    <div ng-if="!busy" class="container lead" style="margin: 75px auto">
+    <div ng-if="!busy" class="container lead" style="margin: 0 auto">
         <div ng-if="displayResults">
-            <div class="row" style="margin-top: 10vh;">
+            <h2 style="color: #4C4C4C">Report</h2>
+            <p class="lead">Here are the results according to what we know</p>
+            <div class="row">
                 <div class="col">
                     <table class="table table-hover">
-                        <thead style="color: #4c4c4c">
-                            <tr>
-                                <th>
-                                    Certainty
-                                </th>
-                                <th>
-                                    Presumable fault
-                                </th>
-                                <th>
-                                </th>
-                            </tr>
-                        </thead>
                         <tbody>
                             <tr ng-class="toggleLabel==fault.label ? 'table-active' : ''" ng-click="showMore(fault.label)" ng-repeat-start="fault in faults.answer" style="cursor:pointer">
                                 <td>
@@ -36,14 +26,14 @@
                                         <span style="color:#b2b2b2;" class="mr-2">
                                             <i ng-if="toggleLabel === fault.label" class="fas fa-angle-up"></i>
                                             <i ng-if="toggleLabel != fault.label"class="fas fa-angle-down"></i>
-                                        </span> {{(fault.probability * 100).toFixed(2)}}%
+                                        </span> {{(fault.probability * 100).toFixed(0)}}%
                                     </span>
 
                                 </td>
                                 <td>{{fault.label_value}}</td>
                                 <td>
-                                    <span ng-show="!endorsed && faults.answer.length > 1" class="badge badge-pill badge-primary" ng-click="endorse(fault)" style="cursor:pointer">This is it!</span>
-                                    <span ng-show="endorsed === fault.label" style="color: #00bc4e"><i class="fas fa-check-circle"></i></span>
+                                    <span ng-show="!endorsed && faults.answer.length > 1" class="badge badge-pill badge-primary float-right" ng-click="endorse(fault)" style="cursor:pointer">This is it!</span>
+                                    <span ng-show="endorsed === fault.label" style="color: #00bc4e"><i class="fas fa-check-circle float-right"></i></span>
                                 </td>
                             </tr>
                             <tr ng-if="toggleLabel === fault.label" ng-repeat-end>

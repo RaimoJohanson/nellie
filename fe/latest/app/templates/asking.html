@@ -1,15 +1,17 @@
-<div ng-controller="asking" class="d-flex justify-content-center" style="height:100vh">
+<div ng-controller="asking" class="d-flex justify-content-center flex-column" style="height:100%">
 
-    <div class="d-flex align-items-center">
+
+    <div class="d-flex block">
         <!-- flex -->
 
-        <img ng-if="loading" class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
+        <img ng-if="loading" class="loader-ring" src="/assets/img/dual_ring-0.9s-200px.svg">
         <div ng-if="!loading" class="container lead">
 
             <div class="row text-center">
                 <div class="col">
-                    <span ng-if="!busy">{{currentQuestion.value}}</span>
-                    <img ng-if="busy" class="d-inline-block align-top" src="/assets/img/Ball-0.4s-50px.svg">
+                    <img ng-class="{'show-loader' : busy }" class="d-inline-block align-top loader" src="/assets/img/Ball-0.4s-50px.svg"> <br />
+                    <span ng-class="{'busy-text': busy }">{{currentQuestion.value}}</span>
+
 
                 </div>
             </div>

@@ -1,0 +1,19 @@
+.corner-ribbon {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #999;
+    color: #fff;
+    line-height: 32px;
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 999;
+}
+
+
+
+body {
+    padding-top: 32px;
+}

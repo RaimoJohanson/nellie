@@ -1,0 +1,23 @@
+{
+  "name": "Nellie-fe",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-animate": "1.5.8",
+    "angular-cookies": "1.5.8",
+    "angular-route": "1.5.8",
+    "angular-sanitize": "1.5.8",
+    "jquery": "^3.1.1"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-less": "^1.0.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-uglify": "^0.10.1",
+    "grunt-ng-annotate": "^1.0.1",
+    "grunt-minify-html": "^2.0.0",
+    "requirejs": "^2.1.20"
+  }
+}
