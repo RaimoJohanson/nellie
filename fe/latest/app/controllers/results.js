@@ -6,7 +6,7 @@ App.controller("results", function($rootScope, $scope, $http, $timeout) {
         results: $scope.faults.answer
     });
 
-    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount && $scope.faults.answer.length < 0) {
+    if ($rootScope.sessionHistory.hit_count >= $rootScope.minHitCount && $scope.faults.answer.length > 0) {
 
         $scope.displayResults = true;
         if (!$scope.faults.answer[0].label_value) {

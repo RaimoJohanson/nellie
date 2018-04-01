@@ -8,8 +8,8 @@
         </div>
         <div ng-if="!busy">
             <form ng-if="feedbackSent == false" ng-submit="submitFeedback();">
-
-
+                <h2 class="mb-0">Feedback & bug report</h2>
+                <p class="lead mb-4">Tell us what you think or report a bug or do both - everything is optional here</p>
                 <div class="form-group" ng-repeat="question in feedbackQuestions">
                     <div ng-if="question.type == 'starRating'">
                         <span class="lead form-title">{{question.label}}</span>
@@ -48,7 +48,7 @@
                         <div class="col">
                             <h4 style="color:#00bc4e;font-size: 4rem;"><i class="fas fa-check-circle"></i></h4>
                             <h4 class="display-4">Thank you!</h4>
-                            <p>We appreciate your feedback</p>
+                            <p>We appreciate your time</p>
                         </div>
                     </div>
                     <div class="row text-center" style="margin: 20px">
