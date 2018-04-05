@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Latest Nellie</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous" />
+    <link href="https://use.fontawesome.com/releases/v5.0.4/css/all.css" rel="stylesheet">
+    <link href="/assets/css/nellie.css" rel="stylesheet">
+    <link href="/assets/css/feedback.css" rel="stylesheet">
+
+    <link href="/assets/css/star_rating.css" rel="stylesheet">
+    <meta name="viewport" content="width=370px, user-scalable=no" />
+
+</head>
+
+<body ng-app="App">
+
+    <div ng-controller="admin" class="container" style="background-color: #fff">
+        <!-- Error box -->
+        <div class="row">
+            <div class="col-12">
+                <div ng-if="err" class="alert alert-info">
+                    {{err}}
+                </div>
+            </div>
+        </div>
+        <!-- Error box -->
+        <div ng-if="!data" class="d-flex justify-content-center" style="min-height:100vh">
+            <div class="d-flex align-items-center">
+                <img class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
+            </div>
+        </div>
+        <div ng-if="data">
+            <div class="row">
+                <div class="col-md-4" ng-repeat="key in keys">
+                    <div class="stats-body" ng-click="selectTab(key)">
+                        <h1>{{data[key].name}}</h1>
+                        <div class="stats-nr">{{ data[key].list.length }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div style="padding: 15px;">
+                        <h2 style="color: #4C4C4C">{{data[selectedTab].name}}</h2>
+                    </div>
+                    <table class="table table-striped">
+                        <tr class="lead">
+                            <th ng-repeat="header in data[selectedTab].headers">{{header}}</th>
+                            <th ng-if="selectedTab === 'sessions'" class="text-center">
+                                <i class="fas fa-info-circle"></i>
+                            </th>
+                        </tr>
+                        <tr ng-repeat="record in data[selectedTab].list">
+                            <td ng-repeat="header in data[selectedTab].headers">{{record[header]}}</td>
+
+                            <td class="text-center" ng-if="selectedTab === 'sessions' && record.ended_at.charAt(0) != '0'">
+                                <div class="btn btn-primary" sessionmodal id="{{record.id}}">Details</div>
+                            </td>
+                            <td class="text-center" ng-if="selectedTab === 'sessions' && record.ended_at.charAt(0) == '0'">
+                                Unavailable
+                            </td>
+
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<!-- Application -->
+<script src="app.js"></script>
+
+</html>
+<!-- 
+what to do
+Amount of features
+amount of labels
+amount of fault instances
+
+-->

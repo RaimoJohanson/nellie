@@ -83,6 +83,39 @@ App.controller("main", function($rootScope, $scope, $http, $timeout) {
     $scope.resetApplication(); //Start asking
 });
 
+App.controller("admin", function($rootScope, $scope, $http, $timeout) {
+
+    $http.get(API_URL + '/admin').then(response => {
+
+        $scope.data = response.data;
+        $scope.keys = Object.keys(response.data);
+        $scope.selectedTab = $scope.keys[3]; //default view
+
+    }).catch(err => {
+        $scope.err = err;
+    });
+
+    $scope.selectTab = (key) => {
+        $scope.selectedTab = key;
+
+    };
+    $scope.answerTranslate = function(answer) {
+        var book = {
+            'eng': {
+                1: 'Yes',
+                2: 'Don\'t know',
+                0: 'No'
+            },
+            'et': {
+                1: 'Jah',
+                2: 'Ei tea',
+                0: 'Ei'
+            }
+        };
+        return book[APP_LANG][answer];
+    };
+});
+
 App.controller("asking", function($rootScope, $scope, $http, $timeout) {
 
     $rootScope.sessionHistory = {
@@ -717,6 +750,65 @@ App.directive("href", function($rootScope, $timeout) {
                     }, 0);
                 }
             });
+        }
+    }
+});
+
+App.directive("sessionmodal", function($templateCache, $http, $compile, $document, $rootScope, $timeout) {
+    return {
+        restrict: "A",
+        scope: false,
+        link: function($scope, $element, $attrs) {
+            var getDetails = (session_id) => {
+                $http.get(API_URL + '/admin/session/' + session_id).then(function(response) {
+
+                    $scope.sessionData = response.data;
+                    $scope.sessionData.session_id = session_id;
+                    $scope.busy = false;
+                }).catch(err => $scope.err = err);
+            };
+
+
+            function openModal(session_id) {
+
+                console.log('openModal');
+
+                $("body").addClass("modal-open");
+
+                $http.get('app/templates/sessionmodal.tpl').then(function(response) {
+
+                    var modal = $compile(response.data)($scope);
+
+                    $document.find('body').eq(0).append(modal);
+
+                    $('#popup-modal').bind("click", function(e) {
+                        if ($(e.target).is("#popup-modal, #close-modal")) {
+                            $(this).remove();
+                            $("body").removeClass("modal-open");
+                            state = 0;
+                        }
+
+                    });
+
+                    $timeout(function() {
+                        $scope.$apply();
+                    }, 0);
+
+                    getDetails(session_id)
+                });
+            };
+
+            $element.bind("click", function(e) {
+                e.preventDefault();
+                console.log($attrs.id);
+                var id = $attrs.id ? $attrs.id : null;
+                if (id) {
+                    $scope.busy = true;
+                    openModal(id);
+                }
+
+            });
+
         }
     }
 });
