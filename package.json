@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Nellie - Collective knowledge sharing AI",
   "main": "server.js",
-  "repository": "github:raimojohanson/nellie"
+  "repository": "github:raimojohanson/nellie",
   "author": "Raimo Johanson <raimo.johanson@gmail.com>",
   "dependencies": {
     "async": "~0.2.8",
@@ -24,6 +24,7 @@
     "socket.io": "~0.9.14"
   },
   "devDependencies": {
-    "chai": "^4.1.2"
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0"
   }
 }
