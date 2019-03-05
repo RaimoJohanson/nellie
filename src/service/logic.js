@@ -2,6 +2,7 @@
 const async = require('async');
 const _ = require('lodash');
 const moment = require('moment');
+const regexId = /^[0-9]*$/g;
 module.exports = function(app) {
     var LabelFeatures = require('../model/generic')(app, 'label_features');
     var Labels = require('../model/generic')(app, 'labels');
@@ -92,8 +93,14 @@ module.exports = function(app) {
             return new Promise((resolve, reject) => {
                 let opts = {};
                 if (query) {
+
                     if (query.label_id) {
-                        opts.where = { 'label_id': query.label_id }
+                        query.label_id = parseInt(query.label_id);
+
+                        if (query.label_id < 1) return reject('Invalid parameter');
+                        if (isNaN(query.label_id)) return reject('Data: No nummerical IDs');
+
+                        opts.where = { 'label_id': query.label_id };
                     }
                     else {
                         opts.whereRaw = "";
@@ -120,23 +127,31 @@ module.exports = function(app) {
                 }).catch(reject);
             });
         },
-        getFeature: function(feature_id) {
+        getFeature: function(query) {
             return new Promise((resolve, reject) => {
-                Features.find(['id', 'value'], { where: { id: feature_id } }).then(data => {
+                if (query.id < 1) reject('Invalid parameter');
+                if (!query.id) return reject('Missing parameter');
+                if (isNaN(parseInt(query.id))) return reject('Invalid parameter');
+
+                Features.find(['id', 'value'], { where: { id: query.id } }).then(data => {
                     return resolve(data[0]);
                 }).catch(reject);
             });
         },
         getLabel: function(query) {
-            if (query.id) {
-                let opts = {};
-                if (typeof(query.id) === 'number') opts.where = { id: query.id };
-                else opts.whereIn = ['id', query.id.split(',').map(Number)];
 
+            if (query.id) {
                 return new Promise((resolve, reject) => {
+                    if (query.id < 1) reject('Missing parameter');
+                    let opts = {};
+                    if (typeof(query.id) === 'number') opts.where = { id: query.id };
+                    else opts.whereIn = ['id', query.id.split(',').map(Number)];
+
+
                     Labels.find(['id', 'value'], opts || null).then(list => {
                         resolve({ list: list });
                     }).catch(reject);
+
                 });
             }
             else if (query.name) {
@@ -168,11 +183,9 @@ module.exports = function(app) {
                     });
                 });
             }
-            else return new Promise((resolve, reject) => {
-                return Labels.find(['id', 'value']).then(list => {
-                    resolve({ list: list });
-                }).catch(reject);
-            });
+            else {
+                return new Promise((resolve, reject) => reject('Missing parameter'));
+            }
 
         },
         addData: function(data) {

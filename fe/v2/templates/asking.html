@@ -1,0 +1,27 @@
+<div ng-controller="asking" class="d-flex justify-content-center" style="height:100vh">
+
+    <div class="d-flex align-items-center">
+        <!-- flex -->
+
+        <img ng-if="loading" class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
+        <div ng-if="!loading" class="container lead">
+
+            <div class="row text-center">
+                <div class="col">
+                    <span ng-if="!busy">{{currentQuestion.value}}</span>
+                    <img ng-if="busy" class="d-inline-block align-top" src="/assets/img/Ball-0.4s-50px.svg">
+
+                </div>
+            </div>
+            <div class="row text-center" style="margin: 20px">
+                <div class="col">
+                    <button type="button" class="btn btn-primary" ng-click="userInteraction('yes')">Yes</button>
+                    <button type="button" class="btn btn-primary" ng-click="userInteraction('unknown')">Don't know</button>
+                    <button type="button" class="btn btn-primary" ng-click="userInteraction('no')">No</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- flex -->
+    </div>
+</div>

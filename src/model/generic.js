@@ -10,6 +10,8 @@ module.exports = function(app, TABLE_NAME) {
             let qb = Knex(TABLE_NAME);
             qb.select(columns);
             if (opts) {
+                if (opts['where'] && Array.isArray(opts['where'])) console.log(opts.where);
+
                 if (opts['where'] && Array.isArray(opts['where'])) opts['where'].forEach(clause => { qb.where(clause[0], clause[1], clause[2]) });
                 else if (opts['where'] && typeof(opts['where']) === 'object') qb.where(opts.where);
 
@@ -25,6 +27,7 @@ module.exports = function(app, TABLE_NAME) {
                 else if (opts['whereRaw']) qb.whereRaw(opts.whereRaw);
 
                 if (opts['orderBy']) qb.orderBy(opts.orderBy[0], opts.orderBy[1]);
+                if (opts['groupBy']) qb.groupBy(opts.groupBy);
 
                 if (opts['limit']) qb.limit(Number(opts.limit));
                 if (opts['page']) qb.offset((opts.page * opts.limit - opts.limit));

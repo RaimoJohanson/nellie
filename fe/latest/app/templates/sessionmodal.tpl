@@ -48,6 +48,23 @@
                     </table>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    <h3>{{sessionData.feedback.name}}</h3>
+                    <p class="lead" ng-if="!sessionData.feedback.list.length">No feedback</p>
+                    <table class="table table-striped">
+
+                        <tr ng-repeat="record in sessionData.feedback.list">
+                            <td>
+                                {{record.question}}
+                            </td>
+                            <td>
+                                {{record.value}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
 
         </div>
     </div>

@@ -1,0 +1,73 @@
+<div ng-controller="results">
+
+    <div ng-if="busy" class="d-flex justify-content-center" style="min-height:100vh">
+        <div class="d-flex align-items-center">
+            <img class="d-inline-block align-top" src="/assets/img/dual_ring-0.9s-200px.svg">
+        </div>
+    </div>
+
+    <div ng-if="!busy" class="container lead" style="margin: 75px auto">
+        <div ng-if="faults.answer.length && sessionHistory.hit_count > 0">
+            <div class="row">
+                <div class="col-12">
+
+                    <h5 style="color: #4c4c4c"><span>We are guessing:</span></h5>
+
+                </div>
+            </div>
+            <div class="row text-center" style="margin-top: 40px;">
+                <div class="col">
+                    <div class="lead" ng-repeat="fault in faults.answer">
+                        <div class="row" style="">
+                            <div class="col-12 col-sm-4">
+                                {{(fault.probability * 100).toFixed(2)}}%
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                {{fault.label_value}}
+                            </div>
+                            <div class="col-12 col-sm-4" ng-if="faults.answer.length > 1">
+                                <span ng-if="can_clarify" class="badge badge-pill badge-primary" ng-click="clarify(fault)" style="cursor:pointer">Clarify</span>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin: 40px;">
+            <div ng-if="faults.answer.length && !sessionHistory.hit_count">
+                <h5 style="color: #4c4c4c"><span>We don't know what to guess since we didn't ask the right questions. But feel free to give us a lesson in case you know the problem!</span></h5>
+            </div>
+            <div ng-if="!faults.answer.length">
+                <h5 style="color: #4c4c4c"><span>We could not figure out what the problem is, but feel free to give us a lesson in case you know!</span></h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-left">
+                <button type="button" class="btn btn-primary" ng-click="resetApplication()"><i class="fas fa-sync-alt"></i> Start again</button>
+            </div>
+            <div class="col text-right">
+                <span ng-if="faults.answer.length && sessionHistory.hit_count > 0">We didn't guess right? Teach us!</span>
+                <span ng-if="!faults.answer.length || !sessionHistory.hit_count" style="font-italic">Teach us, master!</span>
+                <button type="button" class="btn btn-success" href="searchFault"><i class="fas fa-graduation-cap"></i> Share knowledge</button>
+
+            </div>
+        </div>
+        <blockquote class="blockquote text-left" style="margin-top: 40px">
+            <h5 style="color: #4c4c4c"><span>Your answers</span></h5>
+        </blockquote>
+        <table class="table table-striped text-left lead">
+
+            <tbody>
+                <tr ng-repeat="askedQuestion in sessionHistory.interactions">
+                    <td>{{askedQuestion.value}}</td>
+                    <td>
+                        <span ng-if="askedQuestion.decision != 1" class="font-weight-bold" style="color: #4c4c4c">{{answerTranslate(askedQuestion.decision)}}</span>
+                        <span ng-if="askedQuestion.decision == 1" class="font-weight-bold" style="color: #00c430">{{answerTranslate(askedQuestion.decision)}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

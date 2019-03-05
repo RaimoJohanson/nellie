@@ -31,19 +31,18 @@ module.exports = function(app) {
     Logic.endorseData(req.body).then(result => {
       res.json(result);
     }).catch(err => {
-      console.log(err);
       res.status(412).json(err);
     });
   });
-  app.get('/api/feature', function(req, res) {
-    Logic.getFeature(req.query.id).then(result => {
+  app.get('/api/feature', (req, res) => {
+    Logic.getFeature(req.query).then(result => {
       res.json(result);
     }).catch(err => {
       res.status(412).json(err);
     });
   });
 
-  app.get('/api/label', function(req, res) {
+  app.get('/api/label', (req, res) => {
     Logic.getLabel(req.query).then(result => {
       res.json(result);
     }).catch(err => {
@@ -51,7 +50,7 @@ module.exports = function(app) {
     });
   });
 
-  app.put('/api/session/:session_id', function(req, res) {
+  app.put('/api/session/:session_id', (req, res) => {
     Logic.updateSession(req.params.session_id, req.body).then(() => {
       res.end();
     }).catch(err => {

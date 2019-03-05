@@ -21,7 +21,11 @@ module.exports = function(app) {
 
                 let instances = LabelFeatures.find();
 
-                let sessions = SessionHistory.find();
+                let sessions = SessionHistory.find('*', {
+                    where: [
+                        ['ended_at', '>', '0000-00-00 00:00:00']
+                    ]
+                });
 
                 let feedback = Feedback.find();
 
@@ -53,7 +57,6 @@ module.exports = function(app) {
                             list: data[4]
                         }
                     };
-
                     return resolve(summary);
 
                 }).catch(reject);
@@ -88,9 +91,10 @@ module.exports = function(app) {
                         });
                     }).catch(reject);
                 });
+                let feedback = Feedback.find('*', { where: { session_id: session_id } });
 
 
-                Promise.all([sess_ans, sess_res]).then(data => {
+                Promise.all([sess_ans, sess_res, feedback]).then(data => {
 
                     let summary = {
                         answers: {
@@ -102,6 +106,11 @@ module.exports = function(app) {
                             name: 'Report',
                             headers: data[1].length ? Object.keys(data[1][0]) : [],
                             list: data[1]
+                        },
+                        feedback: {
+                            name: 'Feedback',
+                            headers: [],
+                            list: data[2]
                         }
                     };
 

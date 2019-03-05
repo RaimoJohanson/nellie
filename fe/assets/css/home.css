@@ -1,0 +1,38 @@
+body {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.header {
+    height: 90px;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    -webkit-box-shadow: 0px 10px 19px -11px rgba(0, 0, 0, 0.35);
+    -moz-box-shadow: 0px 10px 19px -11px rgba(0, 0, 0, 0.35);
+    box-shadow: 0px 10px 19px -11px rgba(0, 0, 0, 0.35);
+}
+
+.logo {
+
+    background-color: #f6f6f6;
+
+}
+
+.btn-start {
+    background-color: #f000;
+
+    font-weight: 600;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid #000;
+    border-radius: 0px;
+}
+
+.hamburger {
+    font-size: 40px;
+    cursor: pointer;
+}
+
+.land {
+    height: 300px;
+}
